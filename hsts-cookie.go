@@ -13,6 +13,10 @@ var templates = template.Must(template.ParseFiles(
 	"resources/index.html"))
 
 func indexHandler(response http.ResponseWriter, request *http.Request) {
+    if request.TLS != nil {
+        http.Redirect(response, request, "http://" + config.Domain, 302)
+        return
+    }
 	data := struct {
 		Domain string
 	}{
@@ -48,7 +52,7 @@ func main() {
 		aborted <- 0
 	}()
 	go func() {
-		http.ListenAndServeTLS(":4343", "critical/1_nevkontakte.com_bundle.crt", "critical/hsts.key", nil)
+		http.ListenAndServeTLS(":4343", "secret/hsts.crt", "secret/hsts.key", nil)
 		aborted <- 0
 	}()
 	println("Up and running")
