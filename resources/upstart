@@ -1,0 +1,8 @@
+description "HSTS Super Cookie Docker container"
+author "https://github.com/nevkontakte"
+start on filesystem and started docker
+stop on runlevel [!2345]
+respawn
+script
+  /usr/bin/docker start -a hsts_server
+end script
