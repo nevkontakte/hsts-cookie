@@ -2,26 +2,126 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
+
+    <meta http-equiv="content-type" Content="text/html;charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="http://nevkontakte.com/favicon.ico" rel="shortcut icon"/>
+
+    <!-- Additional fonts -->
+    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&amp;subset=latin,cyrillic'
+          rel='stylesheet' type='text/css'>
+    <link href="//fonts.googleapis.com/css?family=PT+Sans+Narrow&amp;text=NevkontakteAntisocialprogrammers place'"
+          rel='stylesheet' type='text/css'>
+    <link href='//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css'
+          rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" href="http://nevkontakte.com/less/nevkontakte.css"/>
+
     <style>
         .set, .get {
             display: none;
         }
+        .set:after, .get:after {
+            font-weight: bold;
+        }
     </style>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="http://tag.{{.Domain}}/dispatch.css">
     <title>JavaScript-less HSTS super-cookie PoC</title>
 </head>
 <body>
 
 <div class="container">
+    <header class="row">
+        <h1 class="logo">
+            <a href="http://nevkontakte.com/" class="blogtitle">
+                Ne v kontakte <small>Antisocial programmer's place</small>
+            </a>
+        </h1>
+        <nav>
+            <a href="http://nevkontakte.com/" class="btn btn-primary btn-lg">Home</a>
+            <a href="https://github.com/nevkontakte/hsts-cookie" class="btn btn-github">
+                <i class="fa fa-github-alt"></i> GitHub
+            </a>
+            <a href="https://twitter.com/nevkontakte" class="btn btn-info">
+                <i class="fa fa-twitter"></i> @nevkontakte
+            </a>
+        </nav>
+    </header>
     <div class="row">
-        <div class="col-md-6 col-md-offset-3">
-            <h2>Here we go</h2>
-            <p class="lead set">Your cookie is set to: </p>
-            <p class="lead get">Your cookie is: </p>
+        <div class="col-md-10 col-md-offset-1">
+            <h1>HSTS Super Cookie</h1>
+            <div class="alert alert-info pull-right col-md-3">
+                <h2>Demonstration</h2>
+                <p class="lead set">Your cookie is set to: </p>
+                <p class="lead get">Your cookie is: </p>
+            </div>
+            <dl>
+                <dt>What is this?</dt>
+                <dd>This is an abuse of HTTP Strict Transport Security technology, which is used to tag people and track them in similar manner as storing a cookie in a browser.</dd>
+                <dt>Why "super"?</dt>
+                <dd>First, it's much harder to get rid of compared to regular cookie: most of modern browsers provide user with no interface to manage HSTS storage. Second, in some browsers (mostly in Chromium-based) HSTS cookie will remain even when site is accessed in "private mode". Third, Safari iOS and OS X, when connected to iCloud, share and sync HSTS storage across devices, so being marked on one machine user becomes trackable on all his devices. See below for details.</dd>
+                <dt>Time to panic?</dt>
+                <dd>Nope. This technique isn't practical as it requires a whole bunch of additional requests to be performed to identify a visitor. Again, see below for details.</dd>
+            </dl>
+
+            <h2>What is this?</h2>
+            <p>HSTS technology allows HTTPS-supporting server to tell browser to send queries to a specific domain over HTTPS only, even if URL explicitly specified HTTP (without "S") schema. This was designed to reduce possibility of man-in-the-middle attacks which strip all HTTPS links down to plain HTTP, making them vulnerable to eavesdropping.</p>
+            <p>To prevent that, server sends <code>Strict-Transport-Security: "max-age=&lt;number_of_seconds&gt;"</code> header, which tells browser that it <em>must</em> send all queries to that host for next <code>number_of_seconds</code> over HTTPS only.</p>
+            <p>It was noticed that this means that browser stores one bit of information per domain (or subdomain) and to could be read with specially crafted script. Original demonstration of this (along with detailed explanation of HSTS) was created by <a href="http://www.radicalresearch.co.uk/lab/hstssupercookies/">Radical Research</a> and utilized JavaScript to write and read bits from browser's HSTS storage.</p>
+            <p>I've been wondering if it's possible to track even paranoid NoScript visitors and after several attempts came up with such implementations. You can see it in action on upper-right corner of this page.</p>
+            <h2>How does this work?</h2>
+            <p>Assume that we have an evil website (say, hsts.nevkontakte.com) which has 8 subdomains like 1.hsts.nevkontakte.com, 2.hsts.nevkontakte.com, ..., 8.hsts.nevkontakte.com and additional subdomain tag.nevkontakte.com. Having this, we're able to store 9 bits of information in visitor's browser.</p>
+            <p>When a user visits <a href="http://hsts.nevkontakte.com/">http://hsts.nevkontakte.com/</a> for the first time</p>
+            <ol>
+                <li>Browser fetches stylesheet <a href="http://tag.hsts.nevkontakte.com/dispatch.css">http://tag.hsts.nevkontakte.com/dispatch.css</a>.</li>
+                <li>This request will arrive to server over plain HTTP telling server that this is user's first visit of hsts.nevkontakte.com and server will reply with redirect to <a href="https://tag.hsts.nevkontakte.com/setup.css">http<u>s</u>://tag.hsts.nevkontakte.com/setup.css</a>.</li>
+                <li>Once server receives request for setup.css, it does several things:
+                    <ol>
+                        <li>Sends HSTS header for tag.hsts.nevkontakte.com, so next request to dispatch.css will be sent over HTTPS.</li>
+                        <li>Generates 8-bit identifier for the visitor and for each bit generates URL of format <code></code>, where N is a bit number from 1 to 8 and X is 1 or 0 depending on value of corresponding bit in the identifier.</li>
+                        <li>Replies with CSS, which imports all eight stylesheets mentioned above, making browser to fetch them all.</li>
+                    </ol>
+                </li>
+                <li>For all requests to <code>https://N.hsts.nekvkontakte.com/set/1.css</code> server replies with header <code>Strict-Transport-Security: "max-age=31536000"</code>, forcing all further requests to that subdomain to be sent over HTTPS.</li>
+                <li>For all requests to <code>https://N.hsts.nekvkontakte.com/set/0.css</code> server replies with header <code>Strict-Transport-Security: "max-age=0"</code>, allowing further requests to that subdomain to be sent over plain HTTP.</li>
+            </ol>
+            <p>On the next visit to <a href="http://hsts.nevkontakte.com/">http://hsts.nevkontakte.com/</a></p>
+            <ol>
+                <li>Browser forces request to <a href="http://tag.hsts.nevkontakte.com/dispatch.css">http://tag.hsts.nevkontakte.com/dispatch.css</a> to be carried over HTTPS, telling server that this is returning visitor.</li>
+                <li>Server generates random token and associates 8-bit variable with it, initially set to 0.</li>
+                <li>For each if 8 bits server generates URL <code>http://N.hsts.nekvkontakte.com/get/&lt;token&gt;.css</code> and responds with CSS, which includes all this sub-stylesheets.</li>
+                <li>Browser starts fetching sub-stylesheets and if on a first visit corresponding bit was 1, browser will force such request over HTTPS, following HSTS policy.</li>
+                <li>Upon receiving request for <code>http://N.hsts.nekvkontakte.com/get/&lt;token&gt;.css</code>, server will set N-th bit of variable associated with <code>token</code> to 1 or 0, depending over which protocol request has arrived.</li>
+                <li>Once all 8 requests have been received, server will have complete identifier of the visitor. Viola!</li>
+            </ol>
+
+            You can find complete PoC sources at <a href="https://github.com/nevkontakte/hsts-cookie"><i class="fa fa-github-alt"></i> GitHub</a>.
+
+            <h2>Time to panic!</h2>
+
+            <p>This PoC demonstrates how powerful CSS can be combined with a bit of server-side magic, although it isn't usually regarded as a possible source of threat. Compared to original demo by <a href="http://www.radicalresearch.co.uk/lab/hstssupercookies/">Radical Research</a> presented technique is even more scary due to following:</p>
+            <ul>
+                <li>It works with NoScript enabled.</li>
+                <li>Any domain can simply add <a href="http://tag.hsts.nevkontakte.com/dispatch.css">http://tag.hsts.nevkontakte.com/dispatch.css</a> stylesheet to enable tracking.</li>
+                <li>CSS-based approach might overcome cross-domain policy to a certain extent, being able to provide feedback using <code>element:after {content: "some information"}</code>.</li>
+            </ul>
+
+            <h2>Scratch that! No panic.</h2>
+
+            <p>Despite of said above, HSTS super cookie doesn't provide any practical threat to user's privacy. First and the most important is that it required one additional request per bit of identifier. This drastically slows down page load and no site which cares about it's audience can afford this. For example, this page uses 31 bit identifier. Assuming that browser opens up to 8 parallel connections per page and ping time to the server 100ms, it would take at least ~1.5 sec to fetch tracking-related stylesheets (dns + tcp handshake + request-response).</p>
+            <p>Second, although Chromium makes available HSTS records from regular mode to private browsing, it doesn't keep HSTS records received in private mode. So if you visit tracking site in private mode only, HSTS cookie will be destroyed as soon as you end private session. Firefox doesn't make make HSTS regular storage in private mode at all (which I personally consider wrong) and current version of IE doesn't support HSTS at all. So, there isn't much to be afraid of, really.</p>
         </div>
     </div>
 </div>
+
+<footer class="page">
+    <p>&copy; 2008&ndash;<script type="application/javascript">document.write(new Date().getFullYear().toString())</script> Alek$, <a href="/">nevkontakte.com</a></p>
+    <p>All posts and resources on this site are published under <a rel="license,nofollow"
+                                                                   href="http://creativecommons.org/licenses/by-nc-sa/3.0/deed.ru">
+        Creative Commons «Attribution-NonCommercial-ShareAlike»</a>.</p>
+</footer>
 
 </body>
 </html>
