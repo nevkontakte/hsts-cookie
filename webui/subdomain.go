@@ -21,7 +21,7 @@ func SetBitHandler(response http.ResponseWriter, request *http.Request) {
 
 	response.Header().Add("Content-Type", "text/css")
 	if params["switch"] == "on" {
-		response.Header().Set("Strict-Transport-Security", "max-age="+config.CookieLifetime)
+		response.Header().Set("Strict-Transport-Security", "max-age="+strconv.Itoa(config.CookieLifetime))
 	} else {
 		response.Header().Set("Strict-Transport-Security", "max-age=0")
 	}

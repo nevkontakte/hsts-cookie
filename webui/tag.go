@@ -5,6 +5,7 @@ import (
 	"github.com/nevkontakte/hsts-cookie/config"
 	"github.com/nevkontakte/hsts-cookie/cookie"
 	"net/http"
+    "strconv"
 )
 
 func TagDispatchHandler(response http.ResponseWriter, request *http.Request) {
@@ -33,7 +34,7 @@ func TagSetupHandler(response http.ResponseWriter, request *http.Request) {
 		}
 
 		response.Header().Add("Content-Type", "text/css")
-		response.Header().Set("Strict-Transport-Security", "max-age="+config.CookieLifetime)
+		response.Header().Set("Strict-Transport-Security", "max-age="+strconv.Itoa(config.CookieLifetime))
 		fmt.Fprintf(response, "@import url(\"https://%s/set/%s.css\") all;\n", subdomain, filename)
 	}
 
