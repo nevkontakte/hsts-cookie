@@ -1,22 +1,24 @@
 package main
 
+//go:generate go-bindata -o assets.go -pkg main public/...
+
 import (
-	"github.com/gorilla/mux"
 	"html/template"
+	"net/http"
+
+	"github.com/gorilla/mux"
 	"github.com/nevkontakte/hsts-cookie/config"
 	"github.com/nevkontakte/hsts-cookie/cookie"
 	"github.com/nevkontakte/hsts-cookie/webui"
-	"net/http"
 )
 
-var templates = template.Must(template.ParseFiles(
-	"resources/index.html"))
+var templates = template.Must(template.New("index.html").Parse(string(MustAsset("public/index.html"))))
 
 func indexHandler(response http.ResponseWriter, request *http.Request) {
-    if request.TLS != nil {
-        http.Redirect(response, request, "http://" + config.Domain, 302)
-        return
-    }
+	if request.TLS != nil {
+		http.Redirect(response, request, "http://"+config.Domain, 302)
+		return
+	}
 	data := struct {
 		Domain string
 	}{
