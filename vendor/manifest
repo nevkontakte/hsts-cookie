@@ -2,9 +2,74 @@
 	"version": 0,
 	"dependencies": [
 		{
+			"importpath": "github.com/apex/log",
+			"repository": "https://github.com/apex/log",
+			"revision": "0296d6eb16bb28f8a0c55668affcf4876dc269be",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/aphistic/golf",
+			"repository": "https://github.com/aphistic/golf",
+			"revision": "4d95b0abb24e76b21d0f20060632c08734b5928b",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/aws/aws-sdk-go/aws",
+			"repository": "https://github.com/aws/aws-sdk-go",
+			"revision": "b76250596b58c99f3b6af79ab32564bf6584316a",
+			"branch": "master",
+			"path": "/aws"
+		},
+		{
+			"importpath": "github.com/aws/aws-sdk-go/internal/shareddefaults",
+			"repository": "https://github.com/aws/aws-sdk-go",
+			"revision": "b76250596b58c99f3b6af79ab32564bf6584316a",
+			"branch": "master",
+			"path": "/internal/shareddefaults"
+		},
+		{
+			"importpath": "github.com/aws/aws-sdk-go/private/protocol",
+			"repository": "https://github.com/aws/aws-sdk-go",
+			"revision": "b76250596b58c99f3b6af79ab32564bf6584316a",
+			"branch": "master",
+			"path": "/private/protocol"
+		},
+		{
+			"importpath": "github.com/aws/aws-sdk-go/service/kinesis",
+			"repository": "https://github.com/aws/aws-sdk-go",
+			"revision": "b76250596b58c99f3b6af79ab32564bf6584316a",
+			"branch": "master",
+			"path": "/service/kinesis"
+		},
+		{
+			"importpath": "github.com/aws/aws-sdk-go/service/sts",
+			"repository": "https://github.com/aws/aws-sdk-go",
+			"revision": "b76250596b58c99f3b6af79ab32564bf6584316a",
+			"branch": "master",
+			"path": "/service/sts"
+		},
+		{
+			"importpath": "github.com/aybabtme/rgbterm",
+			"repository": "https://github.com/aybabtme/rgbterm",
+			"revision": "0ccafcfa2bb9c5589165ab987ff6df9af5e4e000",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/elazarl/go-bindata-assetfs",
 			"repository": "https://github.com/elazarl/go-bindata-assetfs",
 			"revision": "30f82fa23fd844bd5bb1e5f216db87fd77b5eb43",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/go-ini/ini",
+			"repository": "https://github.com/go-ini/ini",
+			"revision": "3d73f4b845efdf9989fffd4b4e562727744a34ba",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/go-logfmt/logfmt",
+			"repository": "https://github.com/go-logfmt/logfmt",
+			"revision": "390ab7935ee28ec6b286364bba9b4dd6410cb3d5",
 			"branch": "master"
 		},
 		{
@@ -12,6 +77,69 @@
 			"repository": "https://github.com/gorilla/mux",
 			"revision": "ac112f7d75a0714af1bd86ab17749b31f7809640",
 			"branch": "master"
+		},
+		{
+			"importpath": "github.com/jmespath/go-jmespath",
+			"repository": "https://github.com/jmespath/go-jmespath",
+			"revision": "bd40a432e4c76585ef6b72d3fd96fb9b6dc7b68d",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/jpillora/backoff",
+			"repository": "https://github.com/jpillora/backoff",
+			"revision": "06c7a16c845dc8e0bf575fafeeca0f5462f5eb4d",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/pkg/errors",
+			"repository": "https://github.com/pkg/errors",
+			"revision": "c605e284fe17294bda444b34710735b29d1a9d90",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/rogpeppe/fastuuid",
+			"repository": "https://github.com/rogpeppe/fastuuid",
+			"revision": "6724a57986aff9bff1a1770e9347036def7c89f6",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/satori/go.uuid",
+			"repository": "https://github.com/satori/go.uuid",
+			"revision": "5bf94b69c6b68ee1b541973bb8e1144db23a194b",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/tj/go-elastic/batch",
+			"repository": "https://github.com/tj/go-elastic",
+			"revision": "4e3970d1a73193d3d4eb1791280cb8b5c26566f6",
+			"branch": "master",
+			"path": "/batch"
+		},
+		{
+			"importpath": "github.com/tj/go-kinesis",
+			"repository": "https://github.com/tj/go-kinesis",
+			"revision": "28ff32f8b54954f8ea365fa278bcfcec35ec094b",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/tj/go-spin",
+			"repository": "https://github.com/tj/go-spin",
+			"revision": "866762925be273d8db6a8b816f359ca41d61bcdb",
+			"branch": "master"
+		},
+		{
+			"importpath": "golang.org/x/net/context",
+			"repository": "https://go.googlesource.com/net",
+			"revision": "f5079bd7f6f74e23c4d65efa0f4ce14cbd6a3c0f",
+			"branch": "master",
+			"path": "/context"
+		},
+		{
+			"importpath": "golang.org/x/sync/errgroup",
+			"repository": "https://go.googlesource.com/sync",
+			"revision": "f52d1811a62927559de87708c8913c1650ce4f26",
+			"branch": "master",
+			"path": "/errgroup"
 		}
 	]
 }
