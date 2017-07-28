@@ -1,12 +1,9 @@
 package main
 
-//go:generate go-bindata -o assets.go -pkg main public/...
-
 import (
 	"context"
 	"flag"
 	"fmt"
-	"html/template"
 	"net/http"
 	"os"
 	"time"
@@ -75,25 +72,6 @@ func (s *Server) ListenAndServe() error {
 	return g.Wait()
 }
 
-var templates = template.Must(template.New("index.html").Parse(string(MustAsset("public/index.html"))))
-
-func indexHandler(response http.ResponseWriter, request *http.Request) {
-	if request.TLS != nil {
-		http.Redirect(response, request, "http://"+config.Domain, 302)
-		return
-	}
-	data := struct {
-		Domain string
-	}{
-		Domain: config.Domain,
-	}
-	err := templates.ExecuteTemplate(response, "index.html", data)
-	if err != nil {
-		http.Error(response, err.Error(), http.StatusInternalServerError)
-	}
-
-}
-
 func printHosts(opts config.Options) {
 	fmt.Println("# Hosts file line for debugging...")
 	fmt.Printf("%s\t%s %s", *addr, opts.Domain, opts.TagDomain())
@@ -138,7 +116,7 @@ func main() {
 	r.HandleFunc("/get/{token:[0-9]+}.css", webui.GetBitHandler).Host("{subdomain:[0-9a-z]}." + config.Domain)
 	r.HandleFunc("/set/{switch:(?:on|off)}.css", webui.SetBitHandler).Host("{subdomain:[0-9a-z]}." + config.Domain)
 
-	r.HandleFunc("/", indexHandler)
+	r.HandleFunc("/", webui.IndexHandler)
 	http.Handle("/", r)
 
 	aborted := make(chan int)
