@@ -25,8 +25,8 @@ var (
 	domain = flag.String("domain", "hsts.nevkontakte.com", "Base domain name for the service.")
 
 	addr      = flag.String("addr", "0.0.0.0", "IP address to bind on.")
-	portHTTP  = flag.Int("port_http", 8080, "Port number for plain HTTP requests.")
-	portHTTPS = flag.Int("port_https", 4343, "Port number for HTTPS requests.")
+	portHTTP  = flag.Int("port_http", 80, "Port number for plain HTTP requests.")
+	portHTTPS = flag.Int("port_https", 443, "Port number for HTTPS requests.")
 
 	acmeDir      = flag.String("acme_dir", "./.acme-cache", "Path for ACME cache directory.")
 	useProdCerts = flag.Bool("use_production_certs", false, "Use Let's Encrypt production service. If not specified, will use staging instead.")
