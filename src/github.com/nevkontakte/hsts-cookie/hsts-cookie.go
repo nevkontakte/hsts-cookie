@@ -2,12 +2,15 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"flag"
 	"fmt"
 	"net/http"
 	"os"
 	"time"
 
+	"golang.org/x/crypto/acme"
+	"golang.org/x/crypto/acme/autocert"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/apex/log"
@@ -24,15 +27,26 @@ var (
 	addr      = flag.String("addr", "0.0.0.0", "IP address to bind on.")
 	portHTTP  = flag.Int("port_http", 8080, "Port number for plain HTTP requests.")
 	portHTTPS = flag.Int("port_https", 4343, "Port number for HTTPS requests.")
+
+	acmeDir      = flag.String("acme_dir", "./.acme-cache", "Path for ACME cache directory.")
+	useProdCerts = flag.Bool("use_production_certs", false, "Use Let's Encrypt production service. If not specified, will use staging instead.")
 )
+
+const LetsEncryptStagingURL = "https://acme-staging.api.letsencrypt.org/directory"
+
+func AcceptTOS(url string) bool {
+	log.Infof("Using this service implies acceptance of ToS at %s", url)
+	return true
+}
 
 type Server struct {
 	Addr      string
 	PortHTTP  int
 	PortHTTPS int
+	Domains   []string
 
-	CertFile string
-	KeyFile  string
+	CacheDir     string
+	UseProdCerts bool
 
 	Handler http.Handler
 }
@@ -43,9 +57,22 @@ func (s *Server) ListenAndServe() error {
 		Handler: s.Handler,
 	}
 
+	acmeDirectory := LetsEncryptStagingURL
+	if s.UseProdCerts {
+		acmeDirectory = acme.LetsEncryptURL
+	}
+
+	m := autocert.Manager{
+		Prompt:     AcceptTOS,
+		HostPolicy: autocert.HostWhitelist(s.Domains...),
+		Cache:      autocert.DirCache(s.CacheDir),
+		Client:     &acme.Client{DirectoryURL: acmeDirectory},
+	}
+
 	secure := http.Server{
-		Addr:    fmt.Sprintf("%s:%d", s.Addr, s.PortHTTPS),
-		Handler: s.Handler,
+		Addr:      fmt.Sprintf("%s:%d", s.Addr, s.PortHTTPS),
+		Handler:   s.Handler,
+		TLSConfig: &tls.Config{GetCertificate: m.GetCertificate},
 	}
 
 	g, ctx := errgroup.WithContext(context.Background())
@@ -57,7 +84,7 @@ func (s *Server) ListenAndServe() error {
 
 	g.Go(func() error {
 		log.Infof("Starting HTTPS server at %q...", secure.Addr)
-		return secure.ListenAndServeTLS(s.CertFile, s.KeyFile)
+		return secure.ListenAndServeTLS("", "")
 	})
 
 	go func() {
@@ -74,8 +101,8 @@ func (s *Server) ListenAndServe() error {
 
 func printHosts(opts config.Options) {
 	fmt.Println("# Hosts file line for debugging...")
-	fmt.Printf("%s\t%s %s", *addr, opts.Domain, opts.TagDomain())
-	for _, v := range opts.BitDomains() {
+	fmt.Printf("%s\t", *addr)
+	for _, v := range opts.AllDomains() {
 		print(" ", v)
 	}
 	println()
@@ -96,9 +123,12 @@ func main() {
 		printHosts(opts)
 	default:
 		s := &Server{
-			Addr:      *addr,
-			PortHTTP:  *portHTTP,
-			PortHTTPS: *portHTTPS,
+			Addr:         *addr,
+			PortHTTP:     *portHTTP,
+			PortHTTPS:    *portHTTPS,
+			Domains:      opts.AllDomains(),
+			UseProdCerts: *useProdCerts,
+			CacheDir:     *acmeDir,
 		}
 		err = s.ListenAndServe()
 	}

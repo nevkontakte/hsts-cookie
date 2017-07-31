@@ -32,3 +32,7 @@ func (o Options) BitDomains() []string {
 
 	return domains
 }
+
+func (o Options) AllDomains() []string {
+	return append([]string{o.Domain, o.TagDomain()}, o.BitDomains()...)
+}
