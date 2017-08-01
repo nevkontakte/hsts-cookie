@@ -1,4 +1,4 @@
 /pkg
 /bin
 /vendor/pkg
-.acme-cache
+.acme-cache*
