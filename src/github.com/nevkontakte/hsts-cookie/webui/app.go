@@ -78,7 +78,7 @@ func (wa *WebApp) TagDispatchHandler(response http.ResponseWriter, request *http
 // and generates a series of requests which would set up the fingerprint.
 func (wa *WebApp) TagSetupHandler(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "text/css")
-	response.Header().Set("Strict-Transport-Security", "max-age="+strconv.Itoa(config.CookieLifetime))
+	response.Header().Set("Strict-Transport-Security", fmt.Sprintf("max-age=%.0f", wa.Opts.CookieLifeTime.Seconds()))
 	domains := wa.Opts.BitDomains()
 	c := cookie.RandomCookie(wa.Opts.CookieBits)
 
@@ -125,7 +125,7 @@ func (wa *WebApp) SetBitHandler(response http.ResponseWriter, request *http.Requ
 func (wa *WebApp) GetBitHandler(response http.ResponseWriter, request *http.Request) {
 	params := mux.Vars(request)
 
-	bit_offset, _ := strconv.ParseUint(params["subdomain"], 32, 32)
+	bit_offset, _ := wa.Opts.DomainToOffset(params["subdomain"])
 
 	token64, _ := strconv.ParseUint(params["token"], 0, 32)
 	token := cookie.Token(token64)

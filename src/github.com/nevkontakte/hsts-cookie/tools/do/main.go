@@ -19,7 +19,7 @@ import (
 var (
 	domain     = flag.String("domain", "hsts.nevkontakte.com", "Base domain name for the service.")
 	target     = flag.String("target", "0.0.0.0", "IP address to point domain and subdomains to. If a domain name is provided, it will be resolved into an IP address at setup time.")
-	cookieBits = flag.Int("cookie_bits", config.CookieBits, "Cookie bit size.")
+	cookieBits = flag.Int("cookie_bits", 32, "Cookie bit size.")
 
 	apiKey = flag.String("api_key", "", "DigitalOcean API key.")
 )

@@ -21,7 +21,9 @@ import (
 var (
 	makeHosts = flag.Bool("make_hosts", false, "Generate /etc/hosts line for debugging and exit.")
 
-	domain = flag.String("domain", "hsts.nevkontakte.com", "Base domain name for the service.")
+	domain         = flag.String("domain", "hsts.nevkontakte.com", "Base domain name for the service.")
+	cookieBits     = flag.Int("cookie_bits", 16, "Number of bits in cookie ID.")
+	cookieLifeTime = flag.Duration("cookie_life_time", 24*time.Hour, "Cookie life time.")
 
 	addr      = flag.String("addr", "0.0.0.0", "IP address to bind on.")
 	portHTTP  = flag.Int("port_http", 80, "Port number for plain HTTP requests.")
@@ -112,8 +114,8 @@ func main() {
 
 	opts := config.Options{
 		Domain:         *domain,
-		CookieLifeTime: time.Hour * 24,
-		CookieBits:     16,
+		CookieLifeTime: *cookieLifeTime,
+		CookieBits:     uint8(*cookieBits),
 	}
 
 	var err error
