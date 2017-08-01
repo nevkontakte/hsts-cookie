@@ -1,6 +1,7 @@
 package config
 
 import (
+	"sort"
 	"strconv"
 	"time"
 )
@@ -29,6 +30,7 @@ func (o Options) BitDomains() []string {
 		subdomain = subdomain + "." + o.Domain
 		domains = append(domains, subdomain)
 	}
+	sort.Strings(domains)
 
 	return domains
 }

@@ -1,91 +1,94 @@
 package cookie
 
 import (
-	"errors"
-	"github.com/nevkontakte/hsts-cookie/config"
 	"math/rand"
-	"strconv"
+	"sync"
 )
 
 type Token uint32
 
 type Cookie struct {
-	Id uint32
+	Id   uint32
+	Size uint8
 }
 
-func RandomCookie() Cookie {
-	return Cookie{Id: rand.Uint32() % (1 << config.CookieBits)}
-}
-
-type MaybeCookie struct {
-	Cookie *Cookie
-	Error  error
-}
-
-func (c *Cookie) Export(domain string) map[string]bool {
-	domains := make(map[string]bool)
-
-	for offset := uint64(0); offset < config.CookieBits; offset++ {
-		subdomain := strconv.FormatUint(offset, config.CookieBits)
-		subdomain = subdomain + "." + domain
-		domains[subdomain] = (c.Id & (1 << offset)) != 0
-	}
-
-	return domains
-}
-
-func ExportSubdomains(domain string) []string {
-	domains := make([]string, config.CookieBits)
-
-	for i := uint64(0); i < config.CookieBits; i++ {
-		subdomain := strconv.FormatUint(i, config.CookieBits)
-		subdomain = subdomain + "." + domain
-		domains[i] = subdomain
-	}
-
-	return domains
-}
-
-type ResolvingCookie struct {
-	Cookie Cookie
-	Mask   uint32
-}
-
-func (rc *ResolvingCookie) IsComplete() bool {
-	return rc.Mask == ((1 << config.CookieBits) - 1)
-}
-
-type CookieResolver struct {
-	resolvingCache map[Token]*ResolvingCookie
-}
-
-func NewResolver() CookieResolver {
-	return CookieResolver{
-		resolvingCache: make(map[Token]*ResolvingCookie),
+func RandomCookie(size uint8) Cookie {
+	return Cookie{
+		Id:   rand.Uint32() % (1 << size),
+		Size: size,
 	}
 }
 
-func (r *CookieResolver) StartResolving() Token {
-	token := Token(rand.Uint32())
-	r.resolvingCache[token] = new(ResolvingCookie)
-	return token
+func (c *Cookie) Export() []bool {
+	bits := []bool{}
+
+	for offset := uint8(0); offset < c.Size; offset++ {
+		bits = append(bits, (c.Id&(1<<offset)) != 0)
+	}
+
+	return bits
 }
 
-func (r *CookieResolver) ResolveBit(token Token, offset uint32, value bool) (*ResolvingCookie, error) {
-	if _, ok := r.resolvingCache[token]; !ok {
-		return nil, errors.New("Invalid resolving token")
-	}
+type Partial struct {
+	mu   sync.Mutex
+	c    Cookie
+	mask uint32
+}
 
-	r.resolvingCache[token].Mask |= (1 << offset)
-	if value {
-		r.resolvingCache[token].Cookie.Id |= (1 << offset)
-	}
+func (p *Partial) Resolved() (Cookie, bool) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
 
-	if r.resolvingCache[token].IsComplete() {
-		rc := r.resolvingCache[token]
-		delete(r.resolvingCache, token)
-		return rc, nil
+	if p.mask == ((1 << p.c.Size) - 1) {
+		return p.c, true
 	} else {
-		return r.resolvingCache[token], nil
+		return Cookie{}, false
 	}
+}
+
+func (p *Partial) SetBit(offset uint8, value bool) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	p.mask |= (1 << offset)
+	if value {
+		p.c.Id |= (1 << offset)
+	}
+}
+
+type Resolver struct {
+	mu    sync.Mutex
+	state map[Token]*Partial
+}
+
+func NewResolver() *Resolver {
+	return &Resolver{state: make(map[Token]*Partial)}
+}
+
+func (r *Resolver) Begin(size uint8) Token {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	for {
+		t := Token(rand.Uint32())
+		if _, ok := r.state[t]; !ok {
+			r.state[t] = &Partial{c: Cookie{Size: size}}
+			return t
+		}
+	}
+}
+
+func (r *Resolver) End(t Token) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	delete(r.state, t)
+}
+
+func (r *Resolver) Get(t Token) (*Partial, bool) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	p, ok := r.state[t]
+	return p, ok
 }
