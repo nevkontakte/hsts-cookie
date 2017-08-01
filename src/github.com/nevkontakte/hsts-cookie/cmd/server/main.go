@@ -14,6 +14,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/apex/log"
+	"github.com/gorilla/handlers"
 	"github.com/nevkontakte/hsts-cookie/config"
 	"github.com/nevkontakte/hsts-cookie/webui"
 )
@@ -130,7 +131,7 @@ func main() {
 			Domains:      opts.AllDomains(),
 			UseProdCerts: *useProdCerts,
 			CacheDir:     *acmeDir,
-			Handler:      webui.New(opts).GetHandler(),
+			Handler:      handlers.LoggingHandler(os.Stderr, webui.New(opts).GetHandler()),
 		}
 		err = s.ListenAndServe()
 	}
