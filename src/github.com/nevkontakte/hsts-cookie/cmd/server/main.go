@@ -54,11 +54,6 @@ type Server struct {
 }
 
 func (s *Server) ListenAndServe() error {
-	plain := http.Server{
-		Addr:    fmt.Sprintf("%s:%d", s.Addr, s.PortHTTP),
-		Handler: s.Handler,
-	}
-
 	acmeDirectory := LetsEncryptStagingURL
 	if s.UseProdCerts {
 		acmeDirectory = acme.LetsEncryptURL
@@ -69,6 +64,11 @@ func (s *Server) ListenAndServe() error {
 		HostPolicy: autocert.HostWhitelist(s.Domains...),
 		Cache:      autocert.DirCache(s.CacheDir),
 		Client:     &acme.Client{DirectoryURL: acmeDirectory},
+	}
+
+	plain := http.Server{
+		Addr:    fmt.Sprintf("%s:%d", s.Addr, s.PortHTTP),
+		Handler: m.HTTPHandler(s.Handler),
 	}
 
 	secure := http.Server{

@@ -4,7 +4,7 @@
 		{
 			"importpath": "cloud.google.com/go/compute/metadata",
 			"repository": "https://code.googlesource.com/gocloud",
-			"revision": "bdd10387fea2497d530c053ab3df52c8ed22f4b5",
+			"revision": "01301d1df8060594708d76bda9062b0205b77e8b",
 			"branch": "master",
 			"path": "/compute/metadata"
 		},
@@ -169,7 +169,7 @@
 		{
 			"importpath": "golang.org/x/crypto/acme/autocert",
 			"repository": "https://go.googlesource.com/crypto",
-			"revision": "558b6879de74bc843225cde5686419267ff707ca",
+			"revision": "b2aa35443fbc700ab74c586ae79b81c171851023",
 			"branch": "master",
 			"path": "/acme/autocert"
 		},
