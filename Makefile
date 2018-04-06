@@ -16,12 +16,15 @@ run: build
 docker-build:
 	docker build -t nevkontakte/hsts-cookie .
 
+docker-push: docker-build
+	docker push nevkontakte/hsts-cookie:latest
+
 docker-run: docker-build
 	docker run --rm -it -p 80:80 -p 443:443 -v hsts-cookie-data:/srv \
 		--name hsts-cookie nevkontakte/hsts-cookie \
 		--domain hsts.n37.link
 
-up:
+up: docker-build
 	docker stack up  -c docker-compose.yml hsts-cookie
 
 down:
