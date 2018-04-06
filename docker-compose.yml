@@ -2,7 +2,7 @@ version: '3'
 services:
   hsts-cookie:
     image: nevkontakte/hsts-cookie:latest
-    command: ["hsts-cookie", "-acme_dir=/srv/acme-cache", "-use_production_certs", "-cookie_bits=16"]
+    command: ["-use_production_certs"]
     ports:
       - 80:80
       - 443:443
