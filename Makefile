@@ -20,3 +20,9 @@ docker-run: docker-build
 	docker run --rm -it -p 80:80 -p 443:443 -v hsts-cookie-data:/srv \
 		--name hsts-cookie nevkontakte/hsts-cookie \
 		--domain hsts.n37.link
+
+up:
+	docker stack up  -c docker-compose.yml hsts-cookie
+
+down:
+	docker stack down hsts-cookie

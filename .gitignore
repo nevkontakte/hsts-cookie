@@ -2,3 +2,4 @@
 /bin
 /vendor/pkg
 .acme-cache*
+/persistent
