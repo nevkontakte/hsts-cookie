@@ -72,9 +72,14 @@ func (s *Server) ListenAndServe() error {
 	}
 
 	secure := http.Server{
-		Addr:      fmt.Sprintf("%s:%d", s.Addr, s.PortHTTPS),
-		Handler:   s.Handler,
-		TLSConfig: &tls.Config{GetCertificate: m.GetCertificate},
+		Addr:    fmt.Sprintf("%s:%d", s.Addr, s.PortHTTPS),
+		Handler: s.Handler,
+		TLSConfig: &tls.Config{GetCertificate: func(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
+			if hello.ServerName == "" {
+				hello.ServerName = s.Domains[0]
+			}
+			return m.GetCertificate(hello)
+		}},
 	}
 
 	g, ctx := errgroup.WithContext(context.Background())
