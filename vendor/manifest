@@ -162,14 +162,14 @@
 		{
 			"importpath": "golang.org/x/crypto/acme",
 			"repository": "https://go.googlesource.com/crypto",
-			"revision": "558b6879de74bc843225cde5686419267ff707ca",
+			"revision": "c126467f60eb25f8f27e5a981f32a87e3965053f",
 			"branch": "master",
 			"path": "/acme"
 		},
 		{
 			"importpath": "golang.org/x/crypto/acme/autocert",
 			"repository": "https://go.googlesource.com/crypto",
-			"revision": "b2aa35443fbc700ab74c586ae79b81c171851023",
+			"revision": "c126467f60eb25f8f27e5a981f32a87e3965053f",
 			"branch": "master",
 			"path": "/acme/autocert"
 		},
