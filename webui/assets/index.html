@@ -17,7 +17,7 @@
     <link href='//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css'
           rel='stylesheet' type='text/css'>
 
-    <link rel="stylesheet" href="http://nevkontakte.com/less/nevkontakte.css"/>
+    <link rel="stylesheet" href="https://nevkontakte.com/scss/nevkontakte.css"/>
 
     <style>
         .set, .get {
@@ -32,28 +32,32 @@
 </head>
 <body>
 
-<div class="container">
-    <header class="row">
+<header class="container mt-3">
+    <div class="row">
         <h1 class="logo">
-            <a href="http://nevkontakte.com/" class="blogtitle">
+            <a href="http://nevkontakte.com/">
                 Ne v kontakte <small>Antisocial programmer's place</small>
             </a>
         </h1>
         <nav>
-            <a href="http://nevkontakte.com/" class="btn btn-primary btn-lg">Home</a>
-            <a href="https://github.com/nevkontakte/hsts-cookie" class="btn btn-github">
-                <i class="fa fa-github-alt"></i> GitHub
-            </a>
-            <a href="https://twitter.com/nevkontakte" class="btn btn-info">
-                <i class="fa fa-twitter"></i> @nevkontakte
-            </a>
+            <div class="nav-row">
+                <a href="http://nevkontakte.com/" class="btn btn-outline-brand mr-2">Home</a>
+                <a href="https://github.com/nevkontakte/hsts-cookie" class="btn btn-dark mr-2">
+                    <i class="fa fa-github-alt"></i> GitHub
+                </a>
+                <a href="https://twitter.com/nevkontakte" class="btn brand-twitter mr-2">
+                    <i class="fa fa-twitter"></i> @nevkontakte
+                </a>
+            </div>
         </nav>
-    </header>
+    </div>
+</header>
+<div class="container mt-2 py-3 bg-white rounded-lg shadow-sm">
     <div class="row">
-        <div class="col-md-10 col-md-offset-1">
+        <div class="col-md-10 offset-md-1">
             <h1>HSTS Super Cookie</h1>
             <div class="alert alert-info pull-right col-md-3">
-                <h2>Demonstration</h2>
+                <h2>Demo</h2>
                 <p class="lead set">Your cookie is set to: </p>
                 <p class="lead get">Your cookie is: </p>
             </div>
