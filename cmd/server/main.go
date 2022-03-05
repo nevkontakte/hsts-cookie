@@ -34,7 +34,7 @@ var (
 	useProdCerts = flag.Bool("use_production_certs", false, "Use Let's Encrypt production service. If not specified, will use staging instead.")
 )
 
-const LetsEncryptStagingURL = "https://acme-staging.api.letsencrypt.org/directory"
+const LetsEncryptStagingURL = "https://acme-staging-v02.api.letsencrypt.org/directory"
 
 func AcceptTOS(url string) bool {
 	log.Infof("Using this service implies acceptance of ToS at %s", url)
